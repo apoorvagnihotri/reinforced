@@ -304,7 +304,10 @@ if __name__ == '__main__':
         returns.append(episode_return)
     
     mean_return = sum(returns) / len(returns)
-    std_return = (sum((r - mean_return) ** 2 for r in returns) / len(returns)) ** 0.5
+    if len(returns) == 1:
+        std_return = 0
+    else:
+        std_return = (sum((r - mean_return) ** 2 for r in returns) / (len(returns) - 1)) ** 0.5
     
     print(f"Mean return: {mean_return:.6f}")
     print(f"Standard deviation of return: {std_return:.6f}")
