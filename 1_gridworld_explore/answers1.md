@@ -1,5 +1,5 @@
 ## Assignment 1: Gridworld Exploration
-#### Submission by: Apoorv Agnihotri (6604679), Gaurav Niranjan, Carla LM
+#### Submission by: Apoorv Agnihotri (6604679), Gaurav Niranjan (6599177), Carla López Martínez (6637484)
 
 * Using the following formula for the return of this system we can solve this exercise: $G_t = R_{t+1} + \gamma\cdot R_{t+2} $, where $R_{t+1}$ = 1 for the left action and 0 for the right action, and $R_{t+2}$ = 0 for the left action and 2 for the right action.
 Following are different cases with different values of $\gamma$ and the optimal policy for each case.
