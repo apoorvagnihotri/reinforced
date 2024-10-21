@@ -37,7 +37,7 @@ $n = (1.96 * 0.014818 / 0.0004)^2 = 5271.95$
 
 This means we need around ~5000 episodes to get a 95% confidence that our mean is within $\pm 0.0004$ of the true mean.
 
-  c. We here need a margin of error to be bigger at 0.05. Below is the table we calculated in part a for the new environment "DiscountGrid" with a discount factor of 0.95. 
+  c. We here need a margin of error +- 0.05. Below is the table we calculated in part a for the new environment "DiscountGrid" with a discount factor of 0.95. 
 
         | k     | mean      | std      |
         |-------|-----------|----------|
