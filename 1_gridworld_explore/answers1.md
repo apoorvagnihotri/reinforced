@@ -11,16 +11,16 @@ Following are different cases with different values of $\gamma$ and the optimal 
  * If we consider $\gamma = 0.5$, either of the policies is optimal because in either case, we get the same reward $G_t = 1 + 0.5\cdot0 = 0 + 0.5\cdot2 = 1$. The optimal policy is $\pi_{left}$ or $\pi_{right}$.
 
 #### 2. Value Estimation in Grid Worlds: implement return computation and value estimation
-a. I tried the following values of k (num of episodes) to calculate the mean and standard deviation of the long-term average discounted rewards of the start state using MazeGrid environment if we were to use the random agent.
+a. We tried the following values of k (num of episodes) to calculate the mean and standard deviation of the long-term average discounted rewards of the start state using MazeGrid environment if we were to use the random agent.
 
-        | k     | mean     | std      |
-        |-------|----------|----------|
-        | 1     | 0.000001 | 0        |
-        | 10    | 0.000010 | 0.000030 |
-        | 100   | 0.000337 | 0.001832 |
-        | 1000  | 0.002951 | 0.015572 |
-        | 5000  | 0.002113 | 0.012364 |
-        | 10000 | 0.002509 | 0.014818 |
+    | k     |  mean     | std      |
+    |-------| ----------|----------|
+    | 1     |  0.185302 | 0        |
+    | 10    |  0.073958 | 0.209786 |
+    | 100   | -0.093550 | 0.244046 |
+    | 1000  | -0.058471 | 0.205473 |
+    | 5000  | -0.061496 | 0.206545 |
+    | 10000 | -0.061757 | 0.207711 |
 
   b. To get a 95% confidence that our mean is within $\pm 0.0004$ of the true mean, we use the law of large numbers. We can assume that the returns from different episodes are iid. According to CLT, we know that $n$ independent samples from a population with mean $\mu$ and standard deviation $\sigma$ will have the mean $X^{bar}$ distributed approximately with $N(\mu, \frac{\sigma}{\sqrt{n}})$. Now we use the formula that relates confidence intereval of the mean with standard deviation and the number of samples. This is a result of using the formula of a Guassian distribution.
     
@@ -33,35 +33,32 @@ E = 0.0004 (desired margin of error)
 
 We can only use the above formula when we already have a good estimate of the standard deviation. In this case, we can use the standard deviation from the previous part to calculate the number of samples needed to get a 95% confidence that our mean is within $\pm 0.0004$ of the true mean. Since we observed that the standard deviation kind of stopped changing after 1000 episodes, we can use the standard deviation from 10000 episodes to calculate the number of samples needed.
 
-$n = (1.96 * 0.014818 / 0.0004)^2 = 5271.95$
+$n = (1.96 * 0.21 / 0.0004)^2 = 1,058,841$
 
-This means we need around ~5000 episodes to get a 95% confidence that our mean is within $\pm 0.0004$ of the true mean.
+This means we need around ~1,000,000 episodes to get a 95% confidence that our mean is within $\pm 0.0004$ of the true mean.
 
   c. We here need a margin of error +- 0.05. Below is the table we calculated in part a for the new environment "DiscountGrid" with a discount factor of 0.95. 
 
-        | k     | mean      | std      |
-        |-------|-----------|----------|
-        | 1     | +0.277390 | 0        |
-        | 10    | -7.734860 | 3.094124 |
-        | 100   | -6.884108 | 3.358412 |
-        | 1000  | -6.336808 | 3.904625 |
-        | 5000  | -6.485487 | 3.727223 |
-        | 10000 | -6.311838 | 3.840347 |
+    | k     |  mean     | std      |
+    |-------| ----------|----------|
+    | 1     |  0.291989 | 0        |
+    | 10    | -0.265131 | 0.442209 |
+    | 100   | -0.144123 | 0.354744 |
+    | 1000  | -0.098549 | 0.370524 |
+    | 5000  | -0.117813 | 0.363687 |
+    | 10000 | -0.106302 | 0.361857 |
     
 We can use the same formula as in part b to calculate the number of samples needed to get a 95% confidence that our mean is within $\pm 0.05$ of the true mean. We can use the standard deviation from 10000 episodes to calculate the number of samples needed.
 
-$n = (1.96 * 3.840347 / 0.05)^2 = 22662$
+$n = (1.96 * 0.36 / 0.05)^2 = 199.15$
 
-This means we need around ~22662 episodes to get a 95% confidence that our mean is within $\pm 0.05$ of the true mean. Since the suggested episodes are more than 10000, we recalculated the mean and the standard deviation of the long term discounted rewards for 30000 episodes. 
-
-        | k     | mean      | std      |
-        |-------|-----------|----------|
-        | 30000 | -6.376765 | 3.792862 |
+This means we need around ~200 episodes to get a 95% confidence that our mean is within $\pm 0.05$ of the true mean.
 
   d. Getting the mean long-term discounted rewards with just 500 episodes returns with the following values:
 
-        | k     | mean      | std      |
-        |-------|-----------|----------|
-        | 500   | -6.258374 | 3.811000 |
+    | k     |  mean     | std      |
+    |-------| ----------|----------|
+    | 500   | -0.108697 | 0.372299 |
 
-As it can be seen, the mean is not within the margin of error of $\pm 0.05$. (This is an approximate statement, because we assumed that the true mean is close to the mean long-term discounted rewards with 30000 episodes, i.e. -6.376765) Thus, we need more episodes to get a 95% confidence that our mean is within $\pm 0.05$ of the true mean.
+With 500 episodes, E = 1.96*0.37/sqrt(500) = 0.032 < 0.1 -> the value estimate will be within the specified confidence interval. We can see in the table, 
+that for 500 episodes the mean is -0.108697, which is in the +- 0.05 range for the long-term mean -0.106302 (for 10000 episodes).
