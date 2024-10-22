@@ -22,4 +22,9 @@ c.
 
 E = 0.05, Z = 1.96, std = 0.36. We would need around 200 episodes.
 
-d. With 500 episodes, E = 1.96*std/sqrt(500) = 0.0316 < 0.1 -> the value estimate will be within the specified confidence interval.
+    | k     |  mean     | std      |
+    |-------| ----------|----------|
+    | 500   | -0.108697 | 0.372299 |
+
+d. With 500 episodes, E = 1.96*std/sqrt(500) = 0.0316 < 0.1 -> the value estimate will be within the specified confidence interval. We can see in the table, 
+that for 500 episodes the mean is -0.108697, which is in the +- 0.05 range for the long-term mean -0.106302 (for 10000 episodes).
