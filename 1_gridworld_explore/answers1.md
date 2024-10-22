@@ -37,7 +37,7 @@ $n = (1.96 * 0.21 / 0.0004)^2 = 1,058,841$
 
 This means we need around ~1,000,000 episodes to get a 95% confidence that our mean is within $\pm 0.0004$ of the true mean.
 
-  c. We here need a margin of error +- 0.05. Below is the table we calculated in part a for the new environment "DiscountGrid" with a discount factor of 0.95. 
+  c. We here need a margin of error $\pm 0.05$. Below is the table we calculated in part a for the new environment "DiscountGrid" with a discount factor of 0.95. 
 
     | k     |  mean     | std      |
     |-------| ----------|----------|
@@ -61,4 +61,4 @@ This means we need around ~200 episodes to get a 95% confidence that our mean is
     | 500   | -0.108697 | 0.372299 |
 
 With 500 episodes, E = 1.96*0.37/sqrt(500) = 0.032 < 0.1 -> the value estimate will be within the specified confidence interval. We can see in the table, 
-that for 500 episodes the mean is -0.108697, which is in the +- 0.05 range for the long-term mean -0.106302 (for 10000 episodes).
+that for 500 episodes the mean is -0.108697, which is in the $\pm 0.05$ range for the long-term mean -0.106302 (for 10000 episodes).
