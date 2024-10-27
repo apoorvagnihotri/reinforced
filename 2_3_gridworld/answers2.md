@@ -1,5 +1,8 @@
 # Homework 2 - Question 1: State-Action Value Function and Policy Iteration
 
+#### Submission by: Apoorv Agnihotri (6604679), Gaurav Niranjan (6599177), Carla López Martínez (6637484)
+
+
 ## Part a) Gridworld Q-Values
 
 To find the Q-values q^π(s,a) for the given states and actions under the equiprobable random policy, we need to consider:
