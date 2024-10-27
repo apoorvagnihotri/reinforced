@@ -7,6 +7,18 @@ To find the Q-values q^π(s,a) for the given states and actions under the equipr
 - Reward is -1 for all transitions
 - The given value function can be used to determine future state values
 
+| 0   | -14 | -20 | -22 |
+| -14 | -18 | -20 | -20 |
+| -20 | -20 | -18 | -14 |
+| -22 | -20 | -14 | 0   |
+
+
+Reeterating the states
+| 0   | 1   | 2   | 3   |
+| 4   | 5   | 6   | 7   |
+| 8   | 9   | 10  | 11  |
+| 12  | 13  | 14  | 15  |
+
 For each state-action pair:
 
 ### q^π(11, down):
