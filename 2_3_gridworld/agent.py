@@ -63,7 +63,7 @@ class RandomAgent(Agent):
 
 
 ################################################################################
-# Exercise 4
+# Exercise 2
 
 class ValueIterationAgent(Agent):
 
@@ -77,7 +77,28 @@ class ValueIterationAgent(Agent):
     self.discount = discount
     self.iterations = iterations
 
-    raise ValueError("Your code here.")
+    states = self.mdp.getStates()
+
+
+
+    #Set value function of all states  = 0
+    self.V = {s: 0 for s in states}
+
+    for i in range(iterations):
+
+      for state in states:
+
+        if self.mdp.isTerminal(state):
+          continue  
+
+        
+        v = self.V[state]
+
+        #Bellman equation:
+        self.V[state] = max (sum(prob * (self.mdp.getReward(state, action, next_state) + discount*self.V[next_state]) for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)) for action in self.mdp.getPossibleActions(state))
+
+  
+
 
 
 
@@ -86,7 +107,7 @@ class ValueIterationAgent(Agent):
     Look up the value of the state (after the indicated
     number of value iteration passes).
     """
-    raise ValueError("Your code here.")
+    return self.V[state] 
 
 
 
@@ -99,7 +120,11 @@ class ValueIterationAgent(Agent):
     to derive it on the fly.
     """
 
-    raise ValueError("Your code here.")
+    q_pi_s_a = sum(prob * (self.mdp.getReward(state, action, next_state) + self.discount*self.V[next_state])
+                   for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action))
+    
+    return q_pi_s_a
+
 
 
 
@@ -109,7 +134,26 @@ class ValueIterationAgent(Agent):
     (after the indicated number of value iteration passes).
     """
 
-    raise ValueError("Your code here.")
+    if self.mdp.isTerminal(state):
+      return None
+    
+
+    actions = self.mdp.getPossibleActions(state)
+
+    best_action = actions[0]
+    best_q_val = float('-inf')
+
+    for action in actions:
+      q_pi_s_a = self.getQValue(state, action)
+      if q_pi_s_a >= best_q_val:
+        best_q_val = q_pi_s_a
+        best_action = action
+
+    return best_action
+      
+      
+
+
 
 
 
@@ -129,7 +173,7 @@ class ValueIterationAgent(Agent):
 
 
 ################################################################################
-# Below can be ignored for Exercise 4
+# Below can be ignored for Exercise 2
 
 class QLearningAgent(Agent):
 
