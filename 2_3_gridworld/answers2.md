@@ -9,7 +9,6 @@ To find the Q-values q^π(s,a) for the given states and actions under the equipr
 
 ```
 | 0   | -14 | -20 | -22 |
-|-----|-----|-----|-----|
 | -14 | -18 | -20 | -20 |
 | -20 | -20 | -18 | -14 |
 | -22 | -20 | -14 | 0   |
@@ -19,7 +18,6 @@ Reeterating the states
 
 ```
 | 0   | 1   | 2   | 3   |
-|-----|-----|-----|-----|
 | 4   | 5   | 6   | 7   |
 | 8   | 9   | 10  | 11  |
 | 12  | 13  | 14  | 15  |
@@ -40,8 +38,8 @@ For each state-action pair:
 
 ### q^π(9, left):
 - Moving left from state 9 leads to state 8
-- State 8 has value -16 according to the given value function
-- q^π(9, left) = -1 + (-16) = -17
+- State 8 has value -20 according to the given value function
+- q^π(9, left) = -1 + (-20) = -21
 
 ## Part b) Optimal Value Function
 
