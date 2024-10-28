@@ -6,7 +6,7 @@
 
 ### Part a) Gridworld Q-Values
 
-To find the Q-values q^π(s,a) for the given states and actions under the equiprobable random policy, we need to consider:
+To find the Q-values $q_{π}(s,a)$ for the given states and actions under the equiprobable random policy, we need to consider:
 - Each action has probability 1/4 under the random policy
 - Reward is -1 for all transitions
 - The given value function can be used to determine future state values
@@ -18,7 +18,7 @@ To find the Q-values q^π(s,a) for the given states and actions under the equipr
 | -22 | -20 | -14 | 0   |
 ```
 
-Reeterating the states
+Our griworld states are:
 
 ```
 | 0   | 1   | 2   | 3   |
@@ -29,27 +29,27 @@ Reeterating the states
 
 For each state-action pair:
 
-#### q^π(11, down):
+#### $q_{π}(11,down)$:
 - Moving down from state 11 leads to state 15 (terminal state)
 - Terminal state has value 0
 - Q-value = Immediate reward + Value of next state
-- q^π(11, down) = -1 + 0 = -1
+- $q_{π}(11,down)$ = -1 + 0 = -1
 
-#### q^π(7, down):
+#### $q_{π}(7,down)$:
 - Moving down from state 7 leads to state 11
 - State 11 has value -14 according to the given value function
-- q^π(7, down) = -1 + (-14) = -15
+- $q_{π}(7,down)$ = -1 + (-14) = -15
 
-#### q^π(9, left):
+#### $q_{π}(9,left)$:
 - Moving left from state 9 leads to state 8
 - State 8 has value -20 according to the given value function
-- q^π(9, left) = -1 + (-20) = -21
+- $q_{π}(9,left)$ = -1 + (-20) = -21
 
 ### Part b) Optimal Value Function
 
 The optimal value function v*(s) in terms of q*(s,a) is:
 
-v*(s) = max_a q*(s,a)
+$v*(s) = max_a q*(s,a)$
 
 This equation states that the optimal value of a state is equal to the maximum Q-value over all possible actions in that state.
 
@@ -57,7 +57,7 @@ This equation states that the optimal value of a state is equal to the maximum Q
 
 The optimal Q-function q*(s,a) in terms of v*, P, and R is:
 
-q*(s,a) = R(s,a) + γ Σ_{s'} P(s'|s,a) v*(s')
+$q*(s,a) = R(s,a) + γ Σ_{s'} P(s'|s,a) v*(s')$
 
 Where:
 - R(s,a) is the reward function
@@ -69,8 +69,8 @@ Where:
 
 The optimal policy π* in terms of q* is:
 
-π*(a|s) = 1 if a = argmax_a q*(s,a)
-π*(a|s) = 0 otherwise
+$π*(a|s) = 1$ if $a = argmax_a q*(s,a)$
+$π*(a|s) = 0$ otherwise
 
 This defines a deterministic policy that always selects the action with the highest Q-value in each state.
 
@@ -78,7 +78,7 @@ This defines a deterministic policy that always selects the action with the high
 
 The Bellman Expectation Equation for q^π(s,a) in terms of only q values is:
 
-q^π(s,a) = R(s,a) + γ Σ_{s'} P(s'|s,a) Σ_{a'} π(a'|s') q^π(s',a')
+$q_{π}(s,a) = R(s,a) + γ Σ_{s'} P(s'|s,a) Σ_{a'} π(a'|s') q_{π}(s',a')$
 
 This equation expresses the Q-value of a state-action pair in terms of:
 - The immediate reward R(s,a)
@@ -116,7 +116,7 @@ On Mazegrid with the default parameters and having 100 iterations of value itera
 
 ## Question 2.3
 
-Yes, I created a new gridworld environment called "CircularGrid". Please check it out in the code below.
+Yes, we created a new gridworld environment called "CircularGrid". Please check it out in the code below.
 
 ```python
 def getCircularGrid():
