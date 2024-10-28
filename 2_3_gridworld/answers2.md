@@ -114,6 +114,10 @@ Achievable with a noisy of 0.02 and discount factor of 1.
 
 On Mazegrid with the default parameters and having 100 iterations of value iterations, we get the value of the start state as 0.28. Instead we got 0.001363 and 0.002232 as the value of the start state in the first exercie running 10 and 10000 episodes. We see there's a difference between the two values, because the values we were getting in the first exercise were for a random policy (with equally probable actions in all directions). In this exercise we first do value iteration to get the optimal policy and then calculate the value of the start state. The value of the start state is higher in the case of the optimal policy because the agent is more likely to reach (quickly) the goal state (with a high reward) following the optimal policy than a random policy. The optimal policy guides the agent to take actions that lead to the goal state with higher probability, resulting in a higher value for the start state.
 
+### Part e)
+
+To be able to avoid the terminal states, we need need a discount factor of 0, but when we have a discount factor of 0, there's no way we can make the agent prefer going up (avoiding the cliff) because both the transitions have the same q value of 0. And in our implementation we choose the action corresponding to the index 0, when we have the same q values for all the actions, which corresponds to the right action.
+
 ## Question 2.3
 
 Yes, we created a new gridworld environment called "CircularGrid". Please check it out in the code below.
