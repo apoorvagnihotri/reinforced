@@ -113,3 +113,18 @@ Achievable with a noisy of 0.02 and discount factor of 1.
 ### Part d)
 
 On Mazegrid with the default parameters and having 100 iterations of value iterations, we get the value of the start state as 0.28. Instead we got 0.001363 and 0.002232 as the value of the start state in the first exercie running 10 and 10000 episodes. We see there's a difference between the two values, because the values we were getting in the first exercise were for a random policy (with equally probable actions in all directions). In this exercise we first do value iteration to get the optimal policy and then calculate the value of the start state. The value of the start state is higher in the case of the optimal policy because the agent is more likely to reach (quickly) the goal state (with a high reward) following the optimal policy than a random policy. The optimal policy guides the agent to take actions that lead to the goal state with higher probability, resulting in a higher value for the start state.
+
+## Question 2.3
+
+Yes, I created a new gridworld environment called "CircularGrid". Please check it out in the code below.
+
+```python
+def getCircularGrid():
+  grid = [['#','#','#','#',+10],
+          [' ',' ',' ','#',' '],
+          [' ','#',' ','#',' '],
+          [' ','#','S','#',' '],
+          [' ','#','#','#',' '],
+          [' ',' ',' ',' ',' ']]
+  return Gridworld(grid)
+```

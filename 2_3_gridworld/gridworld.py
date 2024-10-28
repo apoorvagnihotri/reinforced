@@ -78,6 +78,15 @@ def getMazeGrid():
           ['S',' ',' ',' ']]
   return Gridworld(grid)
 
+def getCircularGrid():
+  grid = [['#','#','#','#',+10],
+          [' ',' ',' ','#',' '],
+          [' ','#',' ','#',' '],
+          [' ','#','S','#',' '],
+          [' ','#','#','#',' '],
+          [' ',' ',' ',' ',' ']]
+  return Gridworld(grid)
+
 
 
 def getUserAction(state, actionFunction):
