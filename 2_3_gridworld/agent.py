@@ -1,65 +1,67 @@
 import util, random
+from mdp import MarkovDecisionProcess
+
 
 class Agent:
 
-  def getAction(self, state):
-    """
-    For the given state, get the agent's chosen
-    action.  The agent knows the legal actions
-    """
-    abstract
+    def getAction(self, state):
+        """
+        For the given state, get the agent's chosen
+        action.  The agent knows the legal actions
+        """
+        abstract
 
-  def getValue(self, state):
-    """
-    Get the value of the state.
-    """
-    abstract
+    def getValue(self, state):
+        """
+        Get the value of the state.
+        """
+        abstract
 
-  def getQValue(self, state, action):
-    """
-    Get the q-value of the state action pair.
-    """
-    abstract
+    def getQValue(self, state, action):
+        """
+        Get the q-value of the state action pair.
+        """
+        abstract
 
-  def getPolicy(self, state):
-    """
-    Get the policy recommendation for the state.
+    def getPolicy(self, state):
+        """
+        Get the policy recommendation for the state.
 
-    May or may not be the same as "getAction".
-    """
-    abstract
+        May or may not be the same as "getAction".
+        """
+        abstract
 
-  def update(self, state, action, nextState, reward):
-    """
-    Update the internal state of a learning agent
-    according to the (state, action, nextState)
-    transistion and the given reward.
-    """
-    abstract
+    def update(self, state, action, nextState, reward):
+        """
+        Update the internal state of a learning agent
+        according to the (state, action, nextState)
+        transistion and the given reward.
+        """
+        abstract
 
 
 class RandomAgent(Agent):
-  """
-  Clueless random agent, used only for testing.
-  """
+    """
+    Clueless random agent, used only for testing.
+    """
 
-  def __init__(self, actionFunction):
-    self.actionFunction = actionFunction
+    def __init__(self, actionFunction):
+        self.actionFunction = actionFunction
 
-  def getAction(self, state):
-    return random.choice(self.actionFunction(state))
+    def getAction(self, state):
+        return random.choice(self.actionFunction(state))
 
-  def getValue(self, state):
-    return 0.0
+    def getValue(self, state):
+        return 0.0
 
-  def getQValue(self, state, action):
-    return 0.0
+    def getQValue(self, state, action):
+        return 0.0
 
-  def getPolicy(self, state):
-    return 'random'
+    def getPolicy(self, state):
+        return "random"
 
-  def update(self, state, action, nextState, reward):
-    pass
+    def update(self, state, action, nextState, reward):
+        pass
 
 
 ################################################################################
@@ -67,186 +69,173 @@ class RandomAgent(Agent):
 
 class ValueIterationAgent(Agent):
 
-  def __init__(self, mdp, discount = 0.9, iterations = 100):
-    """
-    Your value iteration agent should take an mdp on
-    construction, run the indicated number of iterations
-    and then act according to the resulting policy.
-    """
-    self.mdp = mdp
-    self.discount = discount
-    self.iterations = iterations
+    def __init__(self, mdp, discount=0.9, iterations=100):
+        """
+        Your value iteration agent should take an mdp on
+        construction, run the indicated number of iterations
+        and then act according to the resulting policy.
+        """
+        self.mdp: MarkovDecisionProcess = mdp
+        self.discount = discount
+        self.iterations = iterations
 
-    states = self.mdp.getStates()
+        states = self.mdp.getStates()
 
+        # Set value function of all states  = 0
+        self.V = {s: 0 for s in states}
 
+        for i in range(iterations):
 
-    #Set value function of all states  = 0
-    self.V = {s: 0 for s in states}
+            for state in states:
 
-    for i in range(iterations):
+                if self.mdp.isTerminal(state):
+                    continue
 
-      for state in states:
+                v = self.V[state]
+
+                # Bellman equation:
+                self.V[state] = max(
+                    sum(
+                        prob
+                        * (
+                            self.mdp.getReward(state, action, next_state)
+                            + discount * self.V[next_state]
+                        )
+                        for next_state, prob in self.mdp.getTransitionStatesAndProbs(
+                            state, action
+                        )
+                    )
+                    for action in self.mdp.getPossibleActions(state)
+                )
+
+    def getValue(self, state):
+        """
+        Look up the value of the state (after the indicated
+        number of value iteration passes).
+        """
+        return self.V[state]
+
+    def getQValue(self, state, action):
+        """
+        Look up the q-value of the state action pair
+        (after the indicated number of value iteration
+        passes).  Note that value iteration does not
+        necessarily create this quantity and you may have
+        to derive it on the fly.
+        """
+
+        q_pi_s_a = sum(
+            prob
+            * (
+                self.mdp.getReward(state, action, next_state)
+                + self.discount * self.V[next_state]
+            )
+            for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)
+        )
+
+        return q_pi_s_a
+
+    def getPolicy(self, state):
+        """
+        Look up the policy's recommendation for the state
+        (after the indicated number of value iteration passes).
+        """
 
         if self.mdp.isTerminal(state):
-          continue  
+            return None
 
-        
-        v = self.V[state]
+        actions = self.mdp.getPossibleActions(state)
 
-        #Bellman equation:
-        self.V[state] = max (sum(prob * (self.mdp.getReward(state, action, next_state) + discount*self.V[next_state]) for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)) for action in self.mdp.getPossibleActions(state))
+        best_action = actions[0]
+        best_q_val = float("-inf")
 
-  
+        for action in actions:
+            q_pi_s_a = self.getQValue(state, action)
+            if q_pi_s_a >= best_q_val:
+                best_q_val = q_pi_s_a
+                best_action = action
 
+        return best_action
 
+    def getAction(self, state):
+        """
+        Return the action recommended by the policy.
+        """
+        return self.getPolicy(state)
 
+    def update(self, state, action, nextState, reward):
+        """
+        Not used for value iteration agents!
+        """
 
-  def getValue(self, state):
-    """
-    Look up the value of the state (after the indicated
-    number of value iteration passes).
-    """
-    return self.V[state] 
-
-
-
-  def getQValue(self, state, action):
-    """
-    Look up the q-value of the state action pair
-    (after the indicated number of value iteration
-    passes).  Note that value iteration does not
-    necessarily create this quantity and you may have
-    to derive it on the fly.
-    """
-
-    q_pi_s_a = sum(prob * (self.mdp.getReward(state, action, next_state) + self.discount*self.V[next_state])
-                   for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action))
-    
-    return q_pi_s_a
-
-
-
-
-  def getPolicy(self, state):
-    """
-    Look up the policy's recommendation for the state
-    (after the indicated number of value iteration passes).
-    """
-
-    if self.mdp.isTerminal(state):
-      return None
-    
-
-    actions = self.mdp.getPossibleActions(state)
-
-    best_action = actions[0]
-    best_q_val = float('-inf')
-
-    for action in actions:
-      q_pi_s_a = self.getQValue(state, action)
-      if q_pi_s_a >= best_q_val:
-        best_q_val = q_pi_s_a
-        best_action = action
-
-    return best_action
-      
-      
-
-
-
-
-
-  def getAction(self, state):
-    """
-    Return the action recommended by the policy.
-    """
-    return self.getPolicy(state)
-
-
-  def update(self, state, action, nextState, reward):
-    """
-    Not used for value iteration agents!
-    """
-
-    pass
+        pass
 
 
 ################################################################################
 # Below can be ignored for Exercise 2
 
+
 class QLearningAgent(Agent):
 
-  def __init__(self, actionFunction, discount = 0.9, learningRate = 0.1, epsilon = 0.2):
-    """
-    A Q-Learning agent gets nothing about the mdp on
-    construction other than a function mapping states to actions.
-    The other parameters govern its exploration
-    strategy and learning rate.
-    """
-    self.setLearningRate(learningRate)
-    self.setEpsilon(epsilon)
-    self.setDiscount(discount)
-    self.actionFunction = actionFunction
+    def __init__(self, actionFunction, discount=0.9, learningRate=0.1, epsilon=0.2):
+        """
+        A Q-Learning agent gets nothing about the mdp on
+        construction other than a function mapping states to actions.
+        The other parameters govern its exploration
+        strategy and learning rate.
+        """
+        self.setLearningRate(learningRate)
+        self.setEpsilon(epsilon)
+        self.setDiscount(discount)
+        self.actionFunction = actionFunction
 
-    raise "Your code here."
+        raise "Your code here."
 
+    # THESE NEXT METHODS ARE NEEDED TO WIRE YOUR AGENT UP TO THE CRAWLER GUI
 
+    def setLearningRate(self, learningRate):
+        self.learningRate = learningRate
 
+    def setEpsilon(self, epsilon):
+        self.epsilon = epsilon
 
-  # THESE NEXT METHODS ARE NEEDED TO WIRE YOUR AGENT UP TO THE CRAWLER GUI
+    def setDiscount(self, discount):
+        self.discount = discount
 
-  def setLearningRate(self, learningRate):
-    self.learningRate = learningRate
+    # GENERAL RL AGENT METHODS
 
-  def setEpsilon(self, epsilon):
-    self.epsilon = epsilon
+    def getValue(self, state):
+        """
+        Look up the current value of the state.
+        """
 
-  def setDiscount(self, discount):
-    self.discount = discount
+        raise ValueError("Your code here.")
 
-  # GENERAL RL AGENT METHODS
+    def getQValue(self, state, action):
+        """
+        Look up the current q-value of the state action pair.
+        """
 
-  def getValue(self, state):
-    """
-    Look up the current value of the state.
-    """
+        raise ValueError("Your code here.")
 
-    raise ValueError("Your code here.")
+    def getPolicy(self, state):
+        """
+        Look up the current recommendation for the state.
+        """
 
+        raise ValueError("Your code here.")
 
+    def getAction(self, state):
+        """
+        Choose an action: this will require that your agent balance
+        exploration and exploitation as appropriate.
+        """
 
-  def getQValue(self, state, action):
-    """
-    Look up the current q-value of the state action pair.
-    """
+        raise ValueError("Your code here.")
 
-    raise ValueError("Your code here.")
+    def update(self, state, action, nextState, reward):
+        """
+        Update parameters in response to the observed transition.
+        """
 
-
-
-  def getPolicy(self, state):
-    """
-    Look up the current recommendation for the state.
-    """
-
-    raise ValueError("Your code here.")
-
-
-
-  def getAction(self, state):
-    """
-    Choose an action: this will require that your agent balance
-    exploration and exploitation as appropriate.
-    """
-
-    raise ValueError("Your code here.")
-
-
-
-  def update(self, state, action, nextState, reward):
-    """
-    Update parameters in response to the observed transition.
-    """
-
-    raise ValueError("Your code here.")
+        raise ValueError("Your code here.")
