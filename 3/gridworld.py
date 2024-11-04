@@ -182,7 +182,7 @@ def parseOptions():
                          help='Request a window width of X pixels *per grid cell* (default %default)')
     optParser.add_option('-a', '--agent',action='store', metavar="A",
                          type='string',dest='agent',default="random",
-                         help='Agent type (options are \'random\', \'value\' and \'q\', default %default)')
+                         help='Agent type (options are \'random\', \'value\', \'policy\' and \'q\', default %default)')
     optParser.add_option('-t', '--text',action='store_true',
                          dest='textDisplay',default=False,
                          help='Use text-only ASCII display')
@@ -254,6 +254,8 @@ if __name__ == '__main__':
     if opts.episodes == 0:
       opts.episodes = 1
     a = agent.RandomAgent(mdp.getPossibleActions)
+  elif opts.agent == 'policy':
+    a = agent.PolicyIterationAgent(mdp, opts.discount, opts.iters)
   else:
     raise 'Unknown agent type: '+opts.agent
 
@@ -267,6 +269,10 @@ if __name__ == '__main__':
     display.pause()
     display.displayQValues(a, message = "Q-VALUES AFTER "+str(opts.iters)+" ITERATIONS")
     display.pause()
+  
+  if opts.agent == 'policy':
+    display.displayValues(a, message = "VALUES AFTER "+str(opts.iters)+" ITERATIONS")
+    display.pause()
 
   # FIGURE OUT WHAT TO DISPLAY EACH TIME STEP (IF ANYTHING)
   displayCallback = lambda x: None
@@ -274,6 +280,7 @@ if __name__ == '__main__':
     if opts.agent == 'random': displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
     if opts.agent == 'value': displayCallback = lambda state: display.displayValues(a, state, "CURRENT VALUES")
     if opts.agent == 'q': displayCallback = lambda state: display.displayQValues(a, state, "CURRENT Q-VALUES")
+    if opts.agent == 'policy': displayCallback = lambda state: display.displayValues(a, state, "CURRENT POLICY W/ VALUES")
 
   messageCallback = lambda x: printString(x)
   if opts.quiet:

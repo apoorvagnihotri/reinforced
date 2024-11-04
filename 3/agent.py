@@ -172,6 +172,111 @@ class ValueIterationAgent(Agent):
 
 
 ################################################################################
+# Exercise 3
+
+class PolicyIterationAgent(Agent):
+    def __init__(self, mdp, discount=0.9, iterations=100):
+        """
+        Initialize a PolicyIterationAgent with an MDP, discount factor, and number of iterations.
+        """
+        self.mdp: MarkovDecisionProcess = mdp
+        self.discount = discount
+        self.iterations = iterations
+        
+        # Initialize value function and policy for all states
+        states = self.mdp.getStates()
+        self.V = {s: 0 for s in states}
+        self.policy = {s: self.mdp.getPossibleActions(s)[0] if not self.mdp.isTerminal(s) and self.mdp.getPossibleActions(s) else None for s in states}
+        
+        # Run policy iteration
+        for i in range(iterations):
+            # Policy evaluation
+            old_V = self.V.copy()
+            stable = True
+            
+            # Keep evaluating until convergence
+            while True:
+                delta = 0
+                for state in states:
+                    if self.mdp.isTerminal(state):
+                        continue
+                        
+                    v = self.V[state]
+                    # Evaluate current policy
+                    action = self.policy[state]
+                    self.V[state] = sum(
+                        prob * (self.mdp.getReward(state, action, next_state) + 
+                               discount * self.V[next_state])
+                        for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)
+                    )
+                    delta = max(delta, abs(v - self.V[state]))
+                
+                if delta < 1e-6:  # Small threshold for convergence
+                    break
+            
+            # Policy improvement
+            for state in states:
+                if self.mdp.isTerminal(state):
+                    continue
+                    
+                old_action = self.policy[state]
+                actions = self.mdp.getPossibleActions(state)
+                
+                # Find best action according to current values
+                best_action = max(
+                    actions,
+                    key=lambda a: sum(
+                        prob * (self.mdp.getReward(state, a, next_state) + 
+                               discount * self.V[next_state])
+                        for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, a)
+                    )
+                )
+                
+                self.policy[state] = best_action
+                if old_action != best_action:
+                    stable = False
+            
+            # If policy is stable, we've converged
+            if stable:
+                break
+
+    def getValue(self, state):
+        """
+        Return the value of the state after policy iteration.
+        """
+        return self.V[state]
+
+    def getQValue(self, state, action):
+        """
+        Return the Q-value of the state-action pair.
+        """
+        return sum(
+            prob * (self.mdp.getReward(state, action, next_state) + 
+                   self.discount * self.V[next_state])
+            for next_state, prob in self.mdp.getTransitionStatesAndProbs(state, action)
+        )
+
+    def getPolicy(self, state):
+        """
+        Return the policy's action for the state.
+        """
+        return self.policy[state]
+
+    def getAction(self, state):
+        """
+        Return the action recommended by the policy.
+        """
+        return self.getPolicy(state)
+
+    def update(self, state, action, nextState, reward):
+        """
+        Not used for policy iteration agents.
+        """
+        pass
+
+
+
+################################################################################
 # Below can be ignored for Exercise 2
 
 

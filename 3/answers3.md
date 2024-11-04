@@ -51,8 +51,25 @@ By following these steps, the MDP is reduced to a Markov Reward Process, which r
 
 
 
+## Question 3: Policy Iteration
+### Part a) Create a Policy Iteration Agent in agent.py
+### Part b) 
 
+When we use the default noise, we need a total of 2 iterations to allow the start state to have a non-zero value. When we turn of the noise in the transitions probabilities, policy iteration takes a lot longer to get the start state to have more than 0 as state value. In our case we observed it took 6 iterations for start state to have non-zero value.
 
+### Part c) 
 
+It takes a total of 10 policy iterations for the algorithm to converge both in case of default noise and no-noise.
 
+### Part d)
+Advantages of Policy Iteration
+
+* Often converges in fewer iterations than value iteration
+* Can be more efficient in environments where good policies are easlier to find than optimal values.
+
+Disadvantages of Policy Iteration
+
+* Each iteration is more computationally expensive due to the policy evalution step
+* Requires storing an explicit policy for each state, which can be a problem if the state space is too large.
+* Policy evalution step may need multiple iterations to converge.
 
