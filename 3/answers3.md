@@ -4,55 +4,93 @@
 
 ## Question 1: Recap
 
-### Part a) What is an Markov reward process (MRP)?
+### Part a)
 
-A Markov Reward Process (MRP) is a mathematical framework used in the study of reinforcement learning and stochastic processes. It extends the concept of a Markov Chain by incorporating rewards, allowing for the evaluation of policies based on the expected returns. Here are the key components of an MRP:
+A Markov reward process is a modified Markov chain which contains an added term that represents the reward rate associated to each state transition in the process.
 
--  States (S): A finite or infinite set of states that the process can be in. Each state represents a situation in which an agent can find itself.
+### Part b)
 
--  Transition Probabilities (P): A matrix 𝑃(𝑠′∣𝑠) that defines the probability of transitioning from one state 𝑠 to another state 𝑠′. This reflects the dynamics of the system and must satisfy the Markov property, meaning that the future state depends only on the current state and not on the history of past states.
+A Markov Decision Process can be reduced to a Markov Reward Process by removing the decision-making aspect. This can be done by fixing a deterministic policy that the agent must follow instead of letting the agent choose a decision based on probability.
 
--  Rewards (R): A reward function 𝑅(𝑠) that assigns a numerical value (reward) to each state 𝑠. This indicates the immediate reward received upon entering that state.
+### Part c)
 
--  Discount Factor (γ): A value 𝛾 (0 ≤ γ < 1) that represents the importance of future rewards compared to immediate rewards. It is used to compute the expected return over time.
+MRPs can be solved in closed form because they have no decision-making, only states, transitions and rewards. This makes it possible to describe the system as a set of linear equations, which have a closed form. MDPs include actions, so the agent must make decisions that influence the outcomes, introducing complexity to the problem. To find the optimal solution, we require a non-linear and iterative approach, which doesn't have a closed form.
 
-Markov Reward Processes are foundational in reinforcement learning, as they help to model environments where an agent interacts with the world and learns to optimize its behavior based on the rewards received over time. They form the basis for more complex structures like Markov Decision Processes (MDPs), which include actions that influence state transitions.
+## Question 2: TD($\lambda$) updates
+### Part a)
+$G_t^{(n)}$ is defined as:
 
-### Part b) How can I reduce a Markov Decision Process (MDP) to a MRP?
+$$\left(
+G_t^{(n)} = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots + \gamma^{n-1} R_{t+n} + \gamma^n V(S_{t+n})
+\right)$$
 
-Reducing a Markov Decision Process (MDP) to a Markov Reward Process (MRP) involves removing the aspect of decision-making by fixing a specific policy for the agent to follow. Here’s how this reduction works:
+Then, from this formula we derive $G_t^{(n-1)}$:
 
-1. Define a Policy 𝜋
-In an MDP, an agent selects actions based on a policy 𝜋(𝑎∣𝑠), which gives the probability of taking action
-𝑎 in state 𝑠. To convert an MDP to an MRP, choose a specific policy 𝜋 for the agent, effectively removing the decision-making element.
+$$\left(
+G_t^{(n-1)} = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots + \gamma^{n-2} R_{t+n-1} + \gamma^{n-1} V(S_{t+n-1})
+\right)$$
 
-2. Construct State Transition Probabilities under the Policy
-In an MDP, the state transitions depend on both the current state and the chosen action. By fixing a policy, you can calculate a new set of state transition probabilities based solely on the states:
+Finally, we derive $G_{t+1}^{(n-1)}$:
 
-$$P^𝜋(s′∣s)=∑_𝑎[𝜋(a∣s)𝑃(s′∣s,a)]$$
+$$\left(
+G_{t+1}^{(n-1)} = R_{t+2} + \gamma R_{t+3} + \gamma^2 R_{t+4} + \dots + \gamma^{n-2} R_{t+n} + \gamma^{n-1} V(S_{t+n})
+\right)$$
 
-Here, 𝑃^𝜋(𝑠′∣𝑠) is the probability of transitioning from state 𝑠 to 𝑠′ under the policy 𝜋. It’s the weighted sum of the transition probabilities 𝑃(𝑠′∣𝑠,𝑎) across all possible actions, weighted by the probability 𝜋(𝑎∣𝑠) of selecting each action.
+Comparing the last equation with the $G_t^{(n)}$ definition, we can see that:
 
-3. Compute the Expected Reward per State
-In an MDP, the reward depends on both the state and the action taken. To reduce this to an MRP, calculate the expected reward for each state under the chosen policy:
+$$\left(
+G_{t+1}^{(n-1)} = \frac{G_t^{(n)} - R_{t+1}}{\gamma}
+\right)$$
 
-R^\pi(s)=∑_a\pi(a∣s)R(s,a)
+Therefore, the analogous recursive relationship for n-step return $G_t^{(n)}$ is:
 
-4. Resulting Markov Reward Process (MRP)
-The MDP is now reduced to an MRP with:
-
-States 
-$S$: The same set of states as in the MDP.
-Transition Matrix $P^π$ : The state-to-state transition probabilities under the fixed policy $\pi$.
-Reward Function $R^\pi$ : The expected reward function for each state under $\pi$.
-Discount Factor γ: The same discount factor from the original MDP.
-
-By following these steps, the MDP is reduced to a Markov Reward Process, which removes the need for actions and decision-making, allowing us to evaluate the policy's performance solely based on the states, transitions, and rewards.
+$$\left(
+G_t^{(n)} = R_{t+1} + \gamma G_{t+1}^{(n-1)}
+\right)$$
 
 
+### Part b)
+$G_t^{(\lambda)}$ is defined as:
+
+$$\left(
+G_t^{\lambda} = (1 - \lambda) \sum_{n=1}^{\infty} \lambda^{n-1} G_t^{(n)}
+\right)$$
+
+Substituting the expression found in the previous part:
+
+$$\left(
+G_t^{\lambda} = (1 - \lambda) \sum_{n=1}^{\infty} \lambda^{n-1}( R_{t+1} + \gamma G_{t+1}^{(n-1)})
+\right)$$
+
+Separating into two terms:
+
+$$\left(
+G_t^{\lambda} = (1 - \lambda) \sum_{n=1}^{\infty} \lambda^{n-1} R_{t+1} +  (1 - \lambda) \sum_{n=1}^{\infty} \lambda^{n-1} \gamma G_{t+1}^{(n-1)}
+\right)$$
+
+For the first term, $R_{t+1}$ is multiplying so we can take it out of the sum to get:
+
+$$\left(
+(1 - \lambda)  R_{t+1}  \sum_{n=1}^{\infty} \lambda^{n-1} = \frac{(1 - \lambda)  R_{t+1}}{(1 - \lambda)} = R_{t+1}
+\right)$$
+
+For the second term, we expand the first term of the sum:
+
+$$\left(
+(1 - \lambda) \sum_{n=1}^{\infty} \lambda^{n-1} \gamma G_{t+1}^{(n-1)} = \gamma ((1 - \lambda)V(S_{t+1}) + (1 - \lambda) \sum_{n=2}^{\infty} \lambda^{n-1} G_{t+1}^{(n-1)})
+\right)$$
+
+$$\left(
+(1 - \lambda) \sum_{n=2}^{\infty} \lambda^{n-1} G_{t+1}^{(n-1)} = \lambda (1 - \lambda) \sum_{n=1}^{\infty} \lambda^{n-1} G_{t+1}^{(n)} = \lambda G_{t+1}^{\lambda}
+\right)$$
+
+Plugging these two simplifications into the original formula:
+
+$$\left(
+G_t^{\lambda} = R_{t+1} + \gamma ((1 - \lambda)V(S_{t+1}) + \lambda G_{t+1}^{\lambda})
+\right)$$
 
 ## Question 3: Policy Iteration
-### Part a) Create a Policy Iteration Agent in agent.py
 ### Part b) 
 
 When we use the default noise, we need a total of 2 iterations to allow the start state to have a non-zero value. When we turn of the noise in the transitions probabilities, policy iteration takes a lot longer to get the start state to have more than 0 as state value. In our case we observed it took 6 iterations for start state to have non-zero value.
