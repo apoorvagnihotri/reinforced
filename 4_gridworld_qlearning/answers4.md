@@ -37,3 +37,13 @@ Q-Learning agent is unable to learn the optimal policy unlike value iteration in
 1. The high penalty states cause to agent to learn to avoid exploring those states, and alwyas picks the action giving the highest Q-value(exploitation). Consequently it avoids exploring towards the rightmost high reward state.
 
 1. Even running for a lot of episodes and higher value of epsilon, the agent still avoids the path on the right and chooses the safe action. 
+
+### Part c)
+
+In our case of training the Q-learning agent on CliffGrid for 300 episodes, we obtain an average return of -25.259 from the start state. Meanwhile, the value of the start after training is -1.68. They are so different due to the following reasons:
+
+1. The Q-value learned by Q-learning for the start state represents the agent’s best estimate of the optimal return it can achieve from that state by following the learned policy. Q-learning learns the estimates based on the maximum possible Q-value for future states. This results in a value that reflects the best possible performance if the agent follows the optimal path, avoiding penalties as much as possible.
+
+1. In contrast, the average return during training episodes includes all exploration steps and mistakes made by the agent, especially early in training when the agent is exploring the environment. These returns are affected by random exploration steps and suboptimal actions that lead the agent into high-penalty states (-100 reward). 
+
+1. By the time the agent learns to avoid the penalty states more effectively, many episodes have already contributed large negative returns to the average. Even if the agent improves it's policy, it still occasionally explores due to eplsion-greedy exploration, visiting penalty states and consequently keeping the average return lower than the optimal policy's expected return.
