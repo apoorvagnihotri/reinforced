@@ -26,6 +26,14 @@ To make the values from Q-learning closer to the optimal values we could increas
 
 1. Increasing the number of episodes to 300 and keeping the same value of epsilon=0.2, the agent learns the values of the states which are much closer to the ones obtained from value iteration. 
 
-2. Keeping the number of episodes to 100 and increasing epsion to 0.4 leads to more random actions and more exploration. This also brings the values closer to those obtained from value iteration. 
+1. Keeping the number of episodes to 100 and increasing epsion to 0.4 leads to more random actions and more exploration. This also brings the values closer to those obtained from value iteration. 
 
+### Part b)
 
+Q-Learning agent is unable to learn the optimal policy unlike value iteration in case of BridgeGrid due to the following reasons:
+
+1. Q-Learning relies on exploration to find paths to high-reward states, but with such high penalties nearby, the agent avoids exploring far to the right due to the risk of ending up in a high-penalty state.
+
+1. The high penalty states cause to agent to learn to avoid exploring those states, and alwyas picks the action giving the highest Q-value(exploitation). Consequently it avoids exploring towards the rightmost high reward state.
+
+1. Even running for a lot of episodes and higher value of epsilon, the agent still avoids the path on the right and chooses the safe action. 
