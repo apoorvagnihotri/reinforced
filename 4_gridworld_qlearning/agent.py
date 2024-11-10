@@ -167,12 +167,12 @@ class QLearningAgent(Agent):
     strategy and learning rate.
     """
 
-    print("<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>")
+    #print("<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>")
     self.setLearningRate(learningRate)
     self.setEpsilon(epsilon)
     self.setDiscount(discount)
     self.actionFunction = actionFunction
-    print(self.actionFunction)
+    #print(self.actionFunction)
 
     self.qValues = defaultdict(float)   #holds Q-values; keys are (state, action) pairs
 
@@ -271,7 +271,7 @@ class QLearningAgent(Agent):
     Update parameters in response to the observed transition.
     """
 
-    print("Q-Update!!!")
+    #print("Q-Update!!!")
 
     sample = reward + self.discount * self.getValue(nextState)  #here getValue returns the maxQ(s',a) over all actions a 
 
