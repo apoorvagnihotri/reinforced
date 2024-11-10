@@ -1,4 +1,6 @@
 import util, random
+from collections import defaultdict
+
 
 class Agent:
 
@@ -164,12 +166,17 @@ class QLearningAgent(Agent):
     The other parameters govern its exploration
     strategy and learning rate.
     """
+
+    print("<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>")
     self.setLearningRate(learningRate)
     self.setEpsilon(epsilon)
     self.setDiscount(discount)
     self.actionFunction = actionFunction
+    print(self.actionFunction)
 
-    raise ValueError("Your code here.")
+    self.qValues = defaultdict(float)   #holds Q-values; keys are (state, action) pairs
+
+
 
 
 
@@ -192,6 +199,13 @@ class QLearningAgent(Agent):
     Look up the current value of the state.
     """
 
+    actions = self.actionFunction(state)
+
+    if not actions:  #If no actions available
+      return 0.0   
+    
+    return max(self.getQValue(state,action) for action in actions)
+
     raise ValueError("Your code here.")
 
 
@@ -200,6 +214,10 @@ class QLearningAgent(Agent):
     """
     Look up the current q-value of the state action pair.
     """
+
+    #print("GetQVal!!!")
+
+    return self.qValues[(state,action)]
 
     raise ValueError("Your code here.")
 
@@ -210,7 +228,18 @@ class QLearningAgent(Agent):
     Look up the current recommendation for the state.
     """
 
-    raise ValueError("Your code here.")
+    #print("GetPolicy!!")
+
+    actions = self.actionFunction(state)
+
+    if not actions:
+      return 0.0
+    
+    #Action with the highest Q-Value
+    best_action = max(actions, key=lambda action: self.getQValue(state,action))
+
+    return best_action
+
 
 
 
@@ -219,8 +248,21 @@ class QLearningAgent(Agent):
     Choose an action: this will require that your agent balance
     exploration and exploitation as appropriate.
     """
+    #print("GetAction!!!")
 
-    raise ValueError("Your code here.")
+    actions = self.actionFunction(state)
+
+    #print("actions:", actions)
+
+    if not actions:
+      return None
+    
+    if random.random() < self.epsilon:
+      #print("returning random choice")
+      return random.choice(actions)
+    else:
+      return self.getPolicy(state)
+
 
 
 
@@ -229,7 +271,14 @@ class QLearningAgent(Agent):
     Update parameters in response to the observed transition.
     """
 
-    raise ValueError("Your code here.")
+    print("Q-Update!!!")
+
+    sample = reward + self.discount * self.getValue(nextState)  #here getValue returns the maxQ(s',a) over all actions a 
+
+    old_q_val = self.getQValue(state, action)
+    new_q_val = old_q_val + self.learningRate*(sample-old_q_val)
+
+    self.qValues[(state,action)] = new_q_val
 
   def reset(self):
     """
