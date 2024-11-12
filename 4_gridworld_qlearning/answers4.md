@@ -6,11 +6,17 @@
 
 ### Part a)
 
-Q-Learning is considered an off-ploicy control method because in the learning stage it doesn't use current policy to update the Q-value for a (state, action) pair but instead chooses the maximum expected future reward for the next state s' over all possible actions. 
+Q-Learning is considered an off-policy control method because in the learning stage it doesn't use current policy to update the Q-value for a (state, action) pair but instead chooses the maximum expected future reward for the next state s' over all possible actions. 
 
 ### Part b)
 
+No, Q-learning and SARSA are not the same algorithm even if action selection is greedy. Q-learning is off-policy and SARSA is on-policy, so SARSA takes into account the policy. This may result into SARSA producing a different update than Q-learning in cases of ties in Q-values due to a tie-breaking rule or randomness in the policy.
 
+### Part c)
+
+a) The action taken should be the left path, as the expected return from that action is 0.1 due to the reward being drawn from a normal distribution with mean 0.1, which is greater than the reward of 0 from the right path.
+
+b) Q-learning tries to maximize the Q-value of the actions, so over time it will favor the left path over the right path due to the expected return being 0.1 vs 0. However, there is a high variance in the reward from the left path, so the Q-value for that path will have high variance as well, making it fluctuate along the episodes until it eventually converges to the expected Q-value of 0.1 for the left action, which takes preference over the expected Q-value of 0 for the right path.
 
 ## Question 2.1: Q-Learning
 
