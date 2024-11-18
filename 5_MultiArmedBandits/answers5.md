@@ -5,15 +5,32 @@
 
 ### Coding Question 3
 
-Explore-Then-Commit (ETC) vs. ε-Greedy in Multi-Armed Bandits:
 
-Explore-Then-Commit (ETC):
-ETC splits the time horizon into two phases: exploration and exploitation. During exploration, it pulls each arm a fixed number of times to gather information about their expected rewards. Afterward, it commits to exploiting the arm with the highest estimated reward for the rest of the horizon. This method is simple but may suffer from suboptimal decisions if the exploration phase is too short.
+### Performance Comparison of Epsilon-Greedy, ETC, and UCB Strategies
 
-ε-Greedy:
-ε-greedy continuously balances exploration and exploitation throughout the time horizon. With probability ε, it explores by randomly selecting an arm, and with probability 1 − 𝜖, it exploits the arm with the highest estimated reward. It dynamically adapts and avoids rigid phase division, which makes it more flexible but potentially slower to converge to optimal decisions.
+## 1. Epsilon-Greedy
+- **Performance**:  
+  - Epsilon-greedy shows the **highest cumulative regret**, increasing steadily over time.
+  - This is because epsilon-greedy balances exploration and exploitation **suboptimally**. It keeps exploring with a constant probability (epsilon = 0.1), even after the optimal arm is likely known, leading to unnecessary exploration in later stages.
+  - The variance (shaded area) is also high, meaning its performance is less stable compared to other strategies.
 
-Comparison:
-ETC is straightforward and computationally efficient but lacks adaptability since it cannot refine its estimates after committing. In contrast, ε-greedy allows ongoing exploration and adapts over time, making it more robust but slightly more complex in implementation.
+---
 
+## 2. Explore-Then-Commit (ETC)
+- **Performance**:  
+  - ETC outperforms epsilon-greedy with significantly lower cumulative regret.
+  - ETC has a flat regret curve after its exploration phase (controlled by m = 10). Once it commits, it exploits the best arm without any further exploration, ensuring regret grows much slower compared to epsilon-greedy.
+  - However, the regret during the exploration phase is higher compared to UCB because ETC performs exploration deterministically by sampling each arm m times regardless of how promising the arms appear.
 
+---
+
+## 3. UCB
+- **Performance**:  
+  - UCB (with different alpha values) shows the best performance overall, with the lowest cumulative regret. The regret grows very slowly over time.
+  - UCB adapts exploration based on uncertainty, focusing more on underexplored arms early on and shifting to exploitation as confidence increases. This ensures efficient balancing of exploration and exploitation.
+  - Among the UCB variants:
+    - `alpha = 0.5`: Regret is higher compared to larger alpha values. This indicates insufficient exploration early on, leading to higher regret when suboptimal arms are committed early on.
+    - `alpha = 4.0`: This variant achieves slightly better performance because the larger exploration bonus ensures more exploration early, reducing the risk of committing to suboptimal arms.
+    - `alpha = 0.1`: Performs well but slightly worse than `alpha = 4.0` because it provides a smaller exploration bonus, leading to less aggressive exploration.
+
+---
