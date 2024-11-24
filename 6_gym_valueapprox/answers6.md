@@ -33,6 +33,39 @@ One of the most basic way to encode the state is to directly take the pixel valu
 
 ## Q3. 
 
+#### a.
+
+![img](plots\trajectory.png)
+
+#### b.
+![img](plots\0.95-learning-progress.png)
+
+We see that the learning is happening although with a lot of noise.
+
+#### c. Checking out the Value function before and after learning (gamma = 0.95)
+
+##### Before
+![img](plots\0.95-initial-value-function.png)
+
+
+##### After
+![img](plots\0.95-final-value-function.png)
+
+#### d. 
+We see that the the final value fuction does make sense because it (in general) assigns higher value to the states where the angle is close to 0. This is to be expected since we want the pendulam to stay upright. That's the objective. Further, if you notice, the angle valocity if it is close to 0 when the angle is 0, that's perfect because that means it will stay in the same position a bit longer.
+
+#### e. Checking out the Value function before and after learning (gamma = 0.5)
+In general we observe that the training progresses faster and we are able to get a much lower loss with this discount factor. Further, reducing the discount factor actually makes the value function smoother as well. This makes sense because if the objective is to keep the pendulum upright, it makes sense that states closer to the "ideal" state should be closer in value to each other. Therefore having an abrupt final value function is actually suspicious in the first setting.
+
+##### Learning Curve
+![img](plots\0.5-learning-progress.png)
+
+##### Before
+![img](plots\0.5-initial-value-function.png)
+
+##### After
+![img](plots\0.5-final-value-function.png)
+
 
 
 
