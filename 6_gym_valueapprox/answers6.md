@@ -23,7 +23,7 @@ where w is a weight vector. Since ϕ(s) is one-hot encoded, V(s) directly corres
 Thus, tabular methods are a special case where the features are one-hot vectors, enabling exact representation of each state or state-action value.
 
 #### b.
-
+Each $s_j$ has different possible exponents given by $c_{i,j}$, which ranges from 0 to n. Therefore, we have n+1 different choices for $c_{i,j}$. The state space has k dimensions, and each dimension $s_j$ can take on one of n+1 values as explained before, so in total the number of unique features $x_i$(s) is (n+1)^k.
 
 ## Q2. Feature Designing
 
