@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "gym-rl"
+version = "0.2.0"
+description = "Environment for RL-course at Tübingen University - gym"
+authors = ["Georg Martius <georg.martius@uni-tuebingen.de>"]
+readme = "README.md"
+packages = [{include = "gym_rl"}]
+
+[tool.poetry.dependencies]
+matplotlib = "*"
+numpy = "*"
+torch = "*"
+
+# pip install torch == "2.5.1+cpu" -f https://download.pytorch.org/whl/cpu/torch_stable.html
+
+ipykernel = "*"
+jupyter = "*"
+gymnasium = {extras = ["box2d"]}
+
+[[tool.poetry.source]]
+name = "torch"
+# For GPU normally no additional info is needed. otherwise, pick a cuda version that fits your driver
+#url = "https://download.pytorch.org/whl/cu116"
+# this is for CPU 
+# url = "https://download.pytorch.org/whl/cpu"
+priority = "supplemental"
+
+
+[tool.poetry.group.dev.dependencies]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
