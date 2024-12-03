@@ -8,4 +8,4 @@
 
 ## Q2
 
-Please have a look at the notebook for these questions. We tried completing all the parts but were not successful in doing all the parts.
+Please have a look at the notebook for these questions. We tried completing all the parts but were not successful in doing them all.
