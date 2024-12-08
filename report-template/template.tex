@@ -1,0 +1,48 @@
+\documentclass[11pt]{article}
+
+\usepackage{times}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{url}            % simple URL typesetting
+\usepackage{graphics}
+\usepackage{color}
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{amsmath}       % blackboard math symbols
+\usepackage{amssymb}
+
+\usepackage{lipsum}
+
+\usepackage{geometry}
+\geometry{left=2.8cm,right=2.8cm,top=2.6cm,bottom=2.6cm}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{hyperref}% should be the last package you include
+
+\newcommand{\theteam}{}
+\newcommand{\team}[1]{\def\theteam{#1}}
+
+
+\fancyhead[L]{\theteam}
+\fancyhead[R]{\thepage}
+\cfoot{}
+
+\setlength{\parindent}{0pt}
+
+\team{Your-great-team: Anna Musterfrau, Max Mustermann}
+\title{RL-Course 2024/25: Final Project Report}
+\author{\theteam}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}\label{sec:intro}
+\lipsum
+
+\section{Method}\label{sec:Method}
+\cite{wang2016:DDQN}.
+\lipsum
+
+\bibliographystyle{abbrv}
+\bibliography{main}
+
+\end{document}
