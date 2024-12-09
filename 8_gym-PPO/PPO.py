@@ -6,7 +6,14 @@ import gymnasium as gym
 import optparse
 import pickle
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+#if torch.backends.mps.is_available():
+#    device = torch.device("mps")  # Use MPS on Apple silicon
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")  # Use CUDA if available
+else:
+    device = torch.device("cpu")  # Fallback to CPU
+
+print(f"Using device: {device}")
 
 class Memory:
     def __init__(self):
@@ -46,8 +53,11 @@ class ActorCritic(nn.Module):
                 nn.Linear(n_latent_var, 1)
                 )
 
-    def forward(self):
-        raise NotImplementedError
+    def forward(self, state):
+        action_probs = self.action_layer(state)
+        state_value = self.value_layer(state)
+        return action_probs, state_value
+        
 
     def act(self, state, memory):
         state = torch.from_numpy(state).float().to(device)
@@ -109,7 +119,7 @@ class PPO:
         # Optimize policy for K epochs:
         for _ in range(self.K_epochs):
             # TODO: fill this code
-            raise NotImplemented()
+            #raise NotImplemented()
 
             # Evaluating old actions and values: use policy.evaluate
 
@@ -119,10 +129,23 @@ class PPO:
             #  you don't want to backpropagate through the values here, so use detach()
             #  compute the two objectives, normal and clipped
 
+            action_probs, state_values = self.policy(old_states)
+            dist = torch.distributions.Categorical(action_probs)
+
+            log_probs = dist.log_prob(old_actions)
+            dist_entropy = dist.entropy()
+
+            ratios = torch.exp(log_probs - old_logprobs)
+
+            advantages = rewards - state_values.detach().squeeze()
+
+            objective = ratios * advantages
+            objective_clipped = torch.clamp(ratios, 1 - self.eps_clip, 1 + self.eps_clip) * advantages
+
 
             # --- the rest is given
             # the loss is given for you with the magic constants for the value function term and the policy entropy term
-            loss = -torch.min(objective, objective_clipped) + 0.5*self.MseLoss(state_values, rewards) - 0.01*dist_entropy
+            loss = -torch.min(objective, objective_clipped) + 0.5*self.MseLoss(state_values, rewards) - 0.01*dist_entropy.mean()
 
             # take gradient step
             self.optimizer.zero_grad()
@@ -141,6 +164,10 @@ def main():
     optParser.add_option('-c', '--eps',action='store',  type='float',
                          dest='eps_clip',default=0.2,
                          help='Clipping epsilon (default %default)')
+    optParser.add_option('-s', '--seed', action='store', type='int',
+                     dest='seed', default=None,
+                     help='Random seed (default %default)')
+
     # TODO: Consider adding suitable cmd line arguments
 
     opts, args = optParser.parse_args()
@@ -162,7 +189,7 @@ def main():
     gamma = 0.99                # discount factor
     K_epochs = 10               # update policy for K epochs
     eps_clip = opts.eps_clip    # clip parameter for PPO
-    random_seed = None
+    random_seed = opts.seed
     #############################################
 
 
@@ -180,10 +207,16 @@ def main():
     timestep = 0
 
     def save_statistics():
-        with open(f"./results/PPO_{env_name}-eps{eps_clip}-stat.pkl", 'wb') as f:
-            pickle.dump({"rewards" : rewards, "lengths": lengths,
-                         "eps": eps_clip, "seed": random_seed},
-                        f)
+        if random_seed is not None:
+            with open(f"./results_seed/PPO_{env_name}-eps{eps_clip}-seed{random_seed}-stat.pkl", 'wb') as f:
+                pickle.dump({"rewards" : rewards, "lengths": lengths,
+                             "eps": eps_clip, "seed": random_seed},
+                            f)
+        else:
+            with open(f"./results/PPO_{env_name}-eps{eps_clip}-stat.pkl", 'wb') as f:
+                pickle.dump({"rewards" : rewards, "lengths": lengths,
+                             "eps": eps_clip, "seed": random_seed},
+                            f)
 
     # training loop
     for i_episode in range(1, max_episodes+1):
@@ -216,7 +249,10 @@ def main():
         # save every 500 episodes
         if i_episode % 500 == 0:
             print("########## Saving a checkpoint... ##########")
-            torch.save(ppo.policy.state_dict(), f'./results/PPO_{env_name}_{i_episode}-eps{eps_clip}.pth')
+            if random_seed is not None:
+                torch.save(ppo.policy.state_dict(), f'./results_seed/PPO_{env_name}_{i_episode}-eps{eps_clip}-seed{random_seed}.pth')
+            else:
+                torch.save(ppo.policy.state_dict(), f'./results/PPO_{env_name}_{i_episode}-eps{eps_clip}.pth')
             save_statistics()
 
         # logging
@@ -228,7 +264,10 @@ def main():
             print('Episode {} \t avg length: {} \t reward: {}'.format(i_episode, avg_length, avg_reward))
             if avg_reward > solved_reward:
                 print("########## Solved! ##########")
-                torch.save(ppo.policy.state_dict(), f'./results/PPO_{env_name}-eps{eps_clip}-k{K_epochs}-solved.pth')
+                if random_seed is not None:
+                    torch.save(ppo.policy.state_dict(), f'./results_seed/PPO_{env_name}-eps{eps_clip}-seed{random_seed}-k{K_epochs}-solved.pth')
+                else:
+                    torch.save(ppo.policy.state_dict(), f'./results/PPO_{env_name}-eps{eps_clip}-k{K_epochs}-solved.pth')
     save_statistics()
 
 if __name__ == '__main__':

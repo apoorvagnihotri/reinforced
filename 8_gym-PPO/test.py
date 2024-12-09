@@ -7,7 +7,7 @@ import optparse
 def test():
     optParser = optparse.OptionParser()
     optParser.add_option('-e', '--env',action='store', type='string',
-                         dest='env_name',default="LunarLander-v2",
+                         dest='env_name',default="LunarLander-v3",
                          help='Environment (default %default)')
     optParser.add_option('-r', '--render',action='store_true',
                          dest='render',

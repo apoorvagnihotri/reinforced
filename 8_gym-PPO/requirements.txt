@@ -1,6 +1,5 @@
 matplotlib
 numpy
-box2d-py
 swig
 pygame
 gymnasium
