@@ -1,5 +1,4 @@
 import numpy as np
-import hockey.hockey_env as h_env
 import gymnasium as gym
 from importlib import reload
 import time
@@ -38,9 +37,8 @@ from value_net import QNet, compute_target
 
 np.set_printoptions(suppress=True)
 
-reload(h_env)
 
-log_dir = f"runs/test_runs/TE_4_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+log_dir = f"runs/HalfCheetah/TE_4_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
 model_dir = os.path.join(log_dir, "models")
 os.makedirs(model_dir, exist_ok=True)
 writer = SummaryWriter(log_dir)  # Create a new logging directory
@@ -57,8 +55,6 @@ hyperparams = {
     "target_entropy": config.target_entropy,
     "lr_alpha": config.lr_alpha,
     "total_eps": config.episodes,
-    "weight_touch_puck": config.weight_touch_puck,
-    "target_entropy": config.target_entropy,
 }
 
 hyperparam_text = "\n".join([f"{key}: {value}" for key, value in hyperparams.items()])
@@ -67,12 +63,9 @@ hyperparam_text = "\n".join([f"{key}: {value}" for key, value in hyperparams.ite
 writer.add_text("Hyperparameters", hyperparam_text)
 
 def main(score_list):
-    env = env = h_env.HockeyEnv()
-    weak_player = h_env.BasicOpponent(weak=True)
-    strong_player = h_env.BasicOpponent(weak=False)
-    opponents = [weak_player, strong_player]
+    env = gym.make('HalfCheetah-v5')
     state_dim = env.observation_space.shape[0]
-    action_dim = env.num_actions
+    action_dim = env.action_space.shape[0]
     
     print(f'state_dim: {state_dim},  action_dim: {action_dim}')
         
@@ -91,24 +84,17 @@ def main(score_list):
     for n_epi in range(config.episodes):
         s, _ = env.reset()
         done = False
-        count = 0
+        count = 0            
 
-        max_timesteps_per_ep = 250
-        
-        selected_opponent = weak_player
-            
-
-        while count < max_timesteps_per_ep and not done:
+        while count < 2000 and not done:
 
 
             a, log_prob= pi(torch.from_numpy(s).float())
             a = a.cpu().detach().numpy()
-
-            a2 = selected_opponent.act(env.obs_agent_two())
                 
-            s_prime, r, done, truncated, info = env.step(np.hstack([a,a2]))
+            s_prime, r, done, truncated, info = env.step(a)
 
-            memory.put((s, a, r+(config.weight_touch_puck*info['reward_touch_puck']), s_prime, done))
+            memory.put((s, a, r/10.0, s_prime, done))
             score +=r
             s = s_prime
             count += 1
@@ -118,19 +104,19 @@ def main(score_list):
         writer.add_scalar("Training/Eps_Score", score, n_epi)
         score = 0.0
 
-        if memory.size()>2000:
+        if memory.size()>4000:
             for i in range(50):
-                batch = memory.sample(config.batch_size)
-                batch = tuple(t.to(config.device) for t in batch)
+                mini_batch = memory.sample(config.batch_size)
+                mini_batch = tuple(t.to(config.device) for t in mini_batch)
 
-                td_target = compute_target(pi, q1_target, q2_target, batch)
+                td_target = compute_target(pi, q1_target, q2_target, mini_batch)
 
 
-                q1.train_net(td_target, batch)
-                q2.train_net(td_target, batch)
+                q1.train_net(td_target, mini_batch)
+                q2.train_net(td_target, mini_batch)
 
                 #Update policy net
-                sac_loss = pi.train_net(q1, q2, batch)  #sac_loss.shape : [32,1] 
+                sac_loss = pi.train_net(q1, q2, mini_batch)  #sac_loss.shape : [32,1] 
                 sac_losses.append(sac_loss)
 
 
@@ -146,6 +132,7 @@ def main(score_list):
             min_q_values = [item[0].mean().item() for item in sac_losses]
             entropy_values = [item[1].mean().item() for item in sac_losses]
 
+            # Compute overall means using numpy
             mean_min_q = np.mean(min_q_values)
             mean_entropy = np.mean(entropy_values)
 
