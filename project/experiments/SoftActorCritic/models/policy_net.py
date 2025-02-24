@@ -4,11 +4,11 @@ import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 from torch.distributions import Normal
-import config
+
 
 
 class PolicyNet(nn.Module):
-    def __init__(self, learning_rate, state_dim, action_dim):
+    def __init__(self, learning_rate, state_dim, action_dim, config):
         super(PolicyNet, self).__init__()
         self.feature_extractor = nn.Sequential(
             nn.Linear(state_dim, 256),
@@ -28,6 +28,8 @@ class PolicyNet(nn.Module):
             nn.ReLU(),
             nn.Linear(64, action_dim)
         ).to(config.device)
+
+        self.config = config
         
         self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
 
@@ -36,7 +38,7 @@ class PolicyNet(nn.Module):
         self.log_alpha_optimizer = optim.Adam([self.log_alpha], lr=config.lr_alpha)
 
     def forward(self, state):
-        state = state.to(config.device)
+        state = state.to(self.config.device)
         features = F.relu(self.feature_extractor(state))
         
         mu = self.mean_branch(features)
@@ -70,7 +72,7 @@ class PolicyNet(nn.Module):
         self.optimizer.step()
 
         self.log_alpha_optimizer.zero_grad()
-        alpha_loss = -(self.log_alpha.exp() * (total_log_prob + config.target_entropy).detach()).mean()
+        alpha_loss = -(self.log_alpha.exp() * (total_log_prob + self.config.target_entropy).detach()).mean()
         alpha_loss.backward()
         self.log_alpha_optimizer.step()
 

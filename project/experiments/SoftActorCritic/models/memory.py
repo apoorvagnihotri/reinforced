@@ -1,13 +1,13 @@
 import numpy as np
 import collections, random
 import torch
-import config
+
 
 
 
 
 class ReplayBuffer():
-    def __init__(self):
+    def __init__(self, config):
         self.buffer = collections.deque(maxlen=config.buffer_limit)
 
     def put(self, transition):

@@ -26,11 +26,17 @@ import collections, random
 
 
 import os
+import sys
 
 import config
-from memory import ReplayBuffer
-from policy_net import PolicyNet
-from value_net import QNet, compute_target
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from models.memory import ReplayBuffer
+from models.policy_net import PolicyNet
+from models.value_net import QNet, compute_target
 
 
 
@@ -70,9 +76,9 @@ def main(score_list):
     print(f'state_dim: {state_dim},  action_dim: {action_dim}')
         
     
-    memory = ReplayBuffer()
-    q1, q2, q1_target, q2_target = QNet(config.lr_q, state_dim, action_dim).to(config.device), QNet(config.lr_q, state_dim, action_dim).to(config.device), QNet(config.lr_q, state_dim, action_dim).to(config.device), QNet(config.lr_q, state_dim, action_dim).to(config.device)
-    pi = PolicyNet(config.lr_pi, state_dim, action_dim).to(config.device)
+    memory = ReplayBuffer(config)
+    q1, q2, q1_target, q2_target = QNet(config.lr_q, state_dim, action_dim, config).to(config.device), QNet(config.lr_q, state_dim, action_dim, config).to(config.device), QNet(config.lr_q, state_dim, action_dim, config).to(config.device), QNet(config.lr_q, state_dim, action_dim, config).to(config.device)
+    pi = PolicyNet(config.lr_pi, state_dim, action_dim, config).to(config.device)
 
     q1_target.load_state_dict(q1.state_dict())
     q2_target.load_state_dict(q2.state_dict())
@@ -109,7 +115,7 @@ def main(score_list):
                 mini_batch = memory.sample(config.batch_size)
                 mini_batch = tuple(t.to(config.device) for t in mini_batch)
 
-                td_target = compute_target(pi, q1_target, q2_target, mini_batch)
+                td_target = compute_target(pi, q1_target, q2_target, mini_batch, config)
 
 
                 q1.train_net(td_target, mini_batch)

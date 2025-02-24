@@ -3,10 +3,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-import config
 
 class QNet(nn.Module):
-    def __init__(self, lr, state_size, action_size):
+    def __init__(self, lr, state_size, action_size, config):
         super().__init__()
         self.state_layer = nn.Linear(state_size, 128).to(config.device)
         self.action_layer = nn.Linear(action_size, 128).to(config.device)
@@ -17,9 +16,11 @@ class QNet(nn.Module):
         self.output_layer = nn.Linear(128, 1).to(config.device)
         self.optimizer = optim.Adam(self.parameters(), lr=lr)
 
+        self.config = config
+
     def forward(self, state, action):
-        state = state.to(config.device)
-        action = action.to(config.device)
+        state = state.to(self.config.device)
+        action = action.to(self.config.device)
         state_out = F.relu(self.state_layer(state))
         action_out = F.relu(self.action_layer(action))
         merged = torch.cat([state_out, action_out], dim=1)
@@ -36,9 +37,9 @@ class QNet(nn.Module):
 
     def soft_update(self, net_target):
         for param_target, param in zip(net_target.parameters(), self.parameters()):
-            param_target.data.copy_(param_target.data * (1.0 - config.tau) + param.data * config.tau)
+            param_target.data.copy_(param_target.data * (1.0 - self.config.tau) + param.data * self.config.tau)
             
-def compute_target(policy_net, q1, q2, batch):
+def compute_target(policy_net, q1, q2, batch, config):
     s, a, r, s_prime, done = batch
 
     with torch.no_grad():
