@@ -31,7 +31,12 @@ import sys
 
 import config
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+try:
+    base_path = os.path.dirname(__file__)
+except NameError:
+    base_path = os.getcwd()
+
+parent_dir = os.path.abspath(os.path.join(base_path, '..'))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
